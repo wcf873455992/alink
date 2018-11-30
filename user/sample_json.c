@@ -94,7 +94,6 @@ static alink_err_t proactive_report_data()
     char *up_cmd = alink_malloc(ALINK_DATA_LEN);
     char *buffer_tmp = NULL;
 
-    virtual_device.power = 1;
     buffer_tmp = up_cmd;
     buffer_tmp += sprintf(buffer_tmp, "{");
     buffer_tmp += sprintf(buffer_tmp, "\"OnOff_Power\": { \"value\": \"%d\" },", virtual_device.power);
