@@ -338,6 +338,7 @@ alink_err_t alink_trans_init(alink_product_t* info)
     
     alink_wait_ap_connected();
     ALINK_LOGD("connected to ap!");
+    reset_update_router();//add by wcf
     struct station_config wifi_config;
 
     if (esp_info_load(NVS_KEY_WIFI_CONFIG, &wifi_config, sizeof(struct station_config)) <= 0) {

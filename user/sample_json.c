@@ -34,6 +34,7 @@
 #include "esp_alink.h"
 #include "esp_alink_log.h"
 #include "alink_json.h"
+//#include "key.h"
 
 #ifndef ALINK_PASSTHROUGH
 
@@ -93,6 +94,7 @@ static alink_err_t proactive_report_data()
     char *up_cmd = alink_malloc(ALINK_DATA_LEN);
     char *buffer_tmp = NULL;
 
+    virtual_device.power = 1;
     buffer_tmp = up_cmd;
     buffer_tmp += sprintf(buffer_tmp, "{");
     buffer_tmp += sprintf(buffer_tmp, "\"OnOff_Power\": { \"value\": \"%d\" },", virtual_device.power);
@@ -113,6 +115,7 @@ static alink_err_t proactive_report_data()
 
 void read_task_test(void *pvParameters)
 {
+	char flag = 1;
     while (1) {
         ALINK_LOGI("read down cmd param");
         char *down_cmd = alink_malloc(ALINK_DATA_LEN);
@@ -134,7 +137,18 @@ void read_task_test(void *pvParameters)
             ALINK_LOGI("read: OnOff_Power:%d, Color_Temperature: %d, Light_Brightness: %d, TimeDelay_PowerOff: %d, WorkMode_MasterLight: %d, free heap: %d\n",
                        virtual_device.power, virtual_device.temp_value, virtual_device.light_value, virtual_device.time_delay, virtual_device.work_mode,
                        system_get_free_heap_size());
+
+            if(virtual_device.power == 0){//add by wcf
+            	alink_led_off();
+            }else{
+            	alink_led_on();
+            }
         }
+        /*
+        if(flag == 1){
+        	flag = 0;
+        	reset_update_router();
+        }*/
 
         /* post device status to cloud after read */
         proactive_report_data();
@@ -142,7 +156,7 @@ void read_task_test(void *pvParameters)
         json_value_free(jptr);
     }
 }
-
+extern char key_press_flag;
 static int count = 0; /*!< Count the number of packets received */
 static alink_err_t alink_event_handler(alink_event_t event)
 {
@@ -161,6 +175,17 @@ static alink_err_t alink_event_handler(alink_event_t event)
             break;
 
         case ALINK_EVENT_SET_DEVICE_DATA:
+        	if(key_press_flag == 1){
+        	if(virtual_device.power == 1){
+        		virtual_device.power = 0;
+        		alink_led_off();
+        	}else{
+        		virtual_device.power = 1;
+        		alink_led_on();
+        	}
+        		proactive_report_data();
+        		key_press_flag = 0;
+        	}
             count++;
             ALINK_LOGD("The cloud is set to send instructions");
             break;
@@ -178,7 +203,7 @@ static alink_err_t alink_event_handler(alink_event_t event)
             break;
 
         case ALINK_EVENT_UPDATE_ROUTER:
-            ALINK_LOGD("Requests update router");
+            ALINK_LOGD("---------------------Requests update router");
             alink_update_router();
             break;
 
@@ -194,9 +219,13 @@ static alink_err_t alink_event_handler(alink_event_t event)
     return ALINK_OK;
 }
 
+
+
+
 static xTaskHandle read_handle = NULL;
 void start_alink_task(void *pvParameters)
 {
+
     ALINK_LOGD("start demo task, free heap size %d", system_get_free_heap_size());
 
     /* fill main device info here */
@@ -215,7 +244,9 @@ void start_alink_task(void *pvParameters)
         .secret_sandbox = ALINK_SECRET_SANDBOX,
     };
     alink_key_trigger();
+    alink_led();
     esp_info_init();
+    check_update_router();//add by wcf
     esp_alink_init(&product_info, alink_event_handler);
     xTaskCreate(read_task_test, "read_task_test", (1024 + 512) / 4, NULL, tskIDLE_PRIORITY + 5, &read_handle);
     

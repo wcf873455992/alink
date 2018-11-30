@@ -32,7 +32,6 @@ extern "C" {
 #endif
 
 typedef void (* key_function)(void);
-
 struct single_key_param {
     uint32 gpio_name;
     os_timer_t key_5s;

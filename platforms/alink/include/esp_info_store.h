@@ -56,6 +56,7 @@ extern "C" {
 #define ALINK_SPACE_NAME        "ALINK_APP"
 #define NVS_KEY_WIFI_CONFIG     "wifi_config"
 #define ALINK_CONFIG_KEY        "alink_config"
+#define ALINK_CONFIG_ROUTER     "alink_router_config"
 
 /**
  * @brief  Initialize the stored information

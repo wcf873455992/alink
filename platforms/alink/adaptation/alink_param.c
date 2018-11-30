@@ -41,7 +41,7 @@ int alink_write_flash_config(unsigned char *buffer, unsigned int len)
     ALINK_PARAM_CHECK(!buffer);
     ALINK_PARAM_CHECK(len < 0);
     
-    ALINK_LOGD("write config");
+    ALINK_LOGD("write config----------------------------------");
     ALINK_LOGD("write buffer: %s, len: %d", buffer, len);
     int ret = esp_info_save(ALINK_CONFIG_KEY, buffer, len);
     ALINK_ERROR_CHECK(ret < 0, ALINK_ERR, "write config error");
@@ -55,6 +55,7 @@ int alink_read_flash_config(unsigned char *buffer, unsigned int len)
     ALINK_PARAM_CHECK(len < 0);
     
     ALINK_LOGD("read config");
+    //ALINK_LOGD("read buffer: %s, len: %d", buffer, len);
     int ret = esp_info_load(ALINK_CONFIG_KEY, buffer, len);
     ALINK_ERROR_CHECK(ret < 0, ALINK_ERR, "read config error");
 

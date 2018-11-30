@@ -34,15 +34,19 @@ const char *TAG = "alink_key_trigger";
 struct single_key_param *single_key[2];
 struct keys_param keys;
 
+
+char key_press_flag = 0;
 static void key_13_short_press(void)
 {
     ALINK_LOGD("short press..");
+    key_press_flag = 1;
+    alink_event_send(ALINK_EVENT_SET_DEVICE_DATA);
 }
 
 static void key_13_long_press(void)
 {
     ALINK_LOGD("long press..");
-    alink_event_send(ALINK_EVENT_UPDATE_ROUTER);
+    //alink_event_send(ALINK_EVENT_UPDATE_ROUTER);
 }
 
 static void key_sw2_short_press(void)
@@ -58,7 +62,7 @@ static void key_sw2_long_press(void)
 
 void alink_key_trigger()
 {
-    single_key[0] = key_init_single(13, PERIPHS_IO_MUX_MTCK_U, FUNC_GPIO13,
+    single_key[0] = key_init_single(2, PERIPHS_IO_MUX_MTCK_U, FUNC_GPIO13,
                                     key_13_long_press, key_13_short_press);
     single_key[1] = key_init_single(4 , PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4,
                                     key_sw2_long_press, key_sw2_short_press);

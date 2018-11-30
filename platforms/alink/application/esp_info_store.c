@@ -40,6 +40,7 @@ typedef struct alink_info {
 } alink_info_t;
 
 typedef struct alink_info_manager {
+	//uint8_t update_router_flag;
     uint8_t num;
     uint16_t use_length;
     alink_info_t alink_info[INFO_STORE_KEY_NUM];
@@ -87,7 +88,6 @@ alink_err_t esp_info_init()
         g_info_manager.num = 0;
         g_info_manager.use_length = sizeof(alink_info_manager_t);
     }
-
     ALINK_LOGD("alink info addr: 0x%x, num: %d", INFO_STORE_MANAGER_ADDR, g_info_manager.num);
 
     return ALINK_OK;
@@ -162,7 +162,6 @@ ssize_t esp_info_save(const char *key, const void *value, size_t length)
     data_tmp = malloc(g_info_manager.use_length);
     ret = system_param_load(INFO_STORE_MANAGER_ADDR / 4096, 0, data_tmp, g_info_manager.use_length);
     ALINK_ERROR_GOTO(ret == ALINK_FALSE, EXIT, "system_param_load");
-
     memcpy(data_tmp, &g_info_manager, sizeof(alink_info_manager_t));
     memcpy(data_tmp + g_info_manager.alink_info[info_index].offset, value,
            g_info_manager.alink_info[info_index].length);
@@ -212,4 +211,28 @@ ssize_t esp_info_load(const char *key, void *value, size_t length)
 EXIT:
     INFO_MUTEX_UNLOCK();
     return ret ? length : ALINK_ERR;
+}
+
+//add by wcf
+void reset_update_router()
+{
+	char update_router_flag = 0;
+	esp_info_save(ALINK_CONFIG_ROUTER, &update_router_flag, sizeof(update_router_flag));
+	ALINK_LOGD("----------reset_update_router");
+
+}
+void check_update_router()
+{
+    char update_router_flag = 0;
+    esp_info_load(ALINK_CONFIG_ROUTER, &update_router_flag, sizeof(update_router_flag));
+    ALINK_LOGD("----------alink_router_config: %d", update_router_flag);
+    if(update_router_flag >=6){
+    	update_router_flag = 0;
+    	esp_info_save(ALINK_CONFIG_ROUTER, &update_router_flag, sizeof(update_router_flag));
+    	alink_update_router();
+    }else{
+    	update_router_flag++;
+    	esp_info_save(ALINK_CONFIG_ROUTER, &update_router_flag, sizeof(update_router_flag));
+    }
+
 }
