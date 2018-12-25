@@ -130,6 +130,7 @@ python esptool.py --chip esp8266 --port /dev/ttyUSB0 --baud 115200 write_flash -
     > 注：ESP-LAUNCHER 上的 J82 跳针需要用跳线帽短接，否则无法下载
 
 4. 将 ESP8266 开发板标号 2 开关拨上，设置开发板为运行模式；将标号 1 开关拨上，给开发板上电，出现 “ENTER SAMARTCONFIG MODE” 信息，即表示 Alink 程序正常运行，进入配网模式。
+	调试串口波特率74880.
 
     ![烧写检查](docs/readme_image/running.png)
 
